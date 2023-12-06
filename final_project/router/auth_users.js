@@ -35,7 +35,7 @@ regd_users.post("/login", (req,res) => {
 
   if (authenticatedUser(username,password)) {
     let accessToken = jwt.sign({
-      data: password
+      data: username
     }, 'access', { expiresIn: 60*60 });
 
     req.session.authorization = {
@@ -52,30 +52,30 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
   //return res.status(300).json({message: "Yet to be implemented"});
     const isbn = req.params.isbn;
-    //req.user
-    books[isbn]
-    if (friend) { //Check is friend exists
-        let DOB = req.body.DOB;
-        let firstName = req.body.firstName;
-        let lastName = req.body.lastName;
-
-        //if DOB the DOB has been changed, update the DOB 
-        if(DOB) {
-            friend["DOB"] = DOB
-        }
-        //Add similarly for firstName
-        if(firstName) {
-            friend["firstName"] = firstName
-        }
-        //Add similarly for lastName
-        if(lastName) {
-            friend["lastName"] = lastName
-        }
-        friends[email]=friend;
-        res.send(`Friend with the email  ${email} updated.`);
+    if (!books[isbn]) {
+        res.send(`Book with isbn ${isbn} don't exist`)
+    }
+    if (books[isbn].reviews[req.user]) { 
+        books[isbn].reviews[req.user] = req.body.review
+        res.send(`Review for book with isbn ${isbn} updated.`);
     }
     else{
-        res.send("Unable to find friend!");
+        books[isbn].reviews[req.user] = req.body.review
+        res.send(`Review for book with isbn ${isbn} created`);
+    }
+});
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    if (!books[isbn]) {
+        res.send(`Book with isbn ${isbn} don't exist`)
+    }
+    if (!books[isbn].reviews[req.user]) {
+        res.send(`Review not found`)
+    } else {
+    // if (books[isbn].reviews[req.user]) { 
+        delete books[isbn].reviews[req.user]
+        res.send(`Review for book with isbn ${isbn} deleted.`);
     }
 });
 

@@ -36,47 +36,89 @@ public_users.post("/register", (req,res) => {
     return res.status(404).json({message: "Unable to register user."});
 });
 
+let getBooks = new Promise((resolve, reject)=>{
+    setTimeout(()=>{
+        resolve( JSON.stringify(books,null,4))
+    }, 3000)
+})
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
+public_users.get('/', async function (req, res) {
   //Write your code here
   //return res.status(300).json({message: "Yet to be implemented"});
-    res.send(JSON.stringify(books,null,4));
+  getBooks.then((value)=>res.send(value))
+    // res.send(JSON.stringify(books,null,4)); // - before async/await
 });
 
+let getBookByISBN = (isbn) => { 
+    return new Promise((resolve, reject)=>{
+        setTimeout(()=>{
+            resolve( JSON.stringify(books[isbn],null,4))
+        }, 3000)
+    })
+}
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
   //Write your code here
   //return res.status(300).json({message: "Yet to be implemented"});
     const isbn = req.params.isbn;
-    res.send(books[isbn])
+    getBookByISBN(isbn).then((value)=>res.send(value))
+    // res.send(books[isbn]) // -before last tasks
 });
   
+let getBookByAuthor = (author) => { 
+    return new Promise((resolve, reject)=>{
+        setTimeout(()=>{
+            const result = []
+            for (const [key, entry] of Object.entries(books)) {
+                if (entry.author.includes(author)) {
+                    result.push(entry)
+                }
+            }
+            resolve( JSON.stringify(result))
+        }, 3000)
+    })
+}
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   //Write your code here
   //return res.status(300).json({message: "Yet to be implemented"});
   const author = req.params.author;
-  const result = []
-  for (const [key, entry] of Object.entries(books)) {
-    if (entry.author.includes(author)) {
-        result.push(entry)
-    }
-  }
-  res.send(JSON.stringify(result,null,4));
+  getBookByAuthor(author).then((value)=>res.send(value))
+//   const result = []
+//   for (const [key, entry] of Object.entries(books)) {
+//     if (entry.author.includes(author)) {
+//         result.push(entry)
+//     }
+//   }
+//   res.send(JSON.stringify(result,null,4));
 });
 
+let getBookByTitle = (title) => { 
+    return new Promise((resolve, reject)=>{
+        setTimeout(()=>{
+            const result = []
+            for (const [key, entry] of Object.entries(books)) {
+                if (entry.title.includes(title)) {
+                    result.push(entry)
+                }
+            }
+            resolve( JSON.stringify(result))
+        }, 3000)
+    })
+}
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
   //Write your code here
   //return res.status(300).json({message: "Yet to be implemented"});
   const title = req.params.title;
-  const result = []
-  for (const [key, entry] of Object.entries(books)) {
-    if (entry.title.includes(title)) {
-        result.push(entry)
-    }
-  }
-  res.send(JSON.stringify(result,null,4));
+  getBookByTitle(title).then((value)=>res.send(value))
+//   const result = []
+//   for (const [key, entry] of Object.entries(books)) {
+//     if (entry.title.includes(title)) {
+//         result.push(entry)
+//     }
+//   }
+//   res.send(JSON.stringify(result,null,4));
 });
 
 //  Get book review
